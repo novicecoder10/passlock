@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+.env
+.env.local
+.DS_Store
+vault.json
+*.vault
+data/

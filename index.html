@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PassLock</title>
+  <link rel="stylesheet" href="index.css">
+  <!-- Load outfit font for premium UI look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Auth Overlay (Master Password Setup or Unlock) -->
+  <div id="auth-overlay" class="auth-overlay">
+    <div class="auth-card">
+      <div class="auth-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <h2 id="auth-title">Unlock Vault</h2>
+      <p id="auth-subtitle">Enter your master password to decrypt your credential database.</p>
+      
+      <form id="auth-form" class="auth-form">
+        <div class="input-group">
+          <label for="master-password">Master Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="master-password" placeholder="••••••••••••••••" required autofocus>
+            <div id="toggle-auth-password" class="toggle-pw">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </div>
+          </div>
+          <div id="auth-error" class="auth-error">Incorrect password. Please try again.</div>
+        </div>
+        
+        <button type="submit" id="auth-submit-btn" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          Unlock Vault
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main App Layout -->
+  <div id="app-container">
+    
+    <!-- Sidebar -->
+    <aside>
+      <div class="logo-container">
+        <div class="logo-icon">▲</div>
+        <div class="logo-text">PassLock</div>
+      </div>
+      
+      <ul class="sidebar-menu">
+        <li class="menu-item active" data-tab="all">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+          All Items
+        </li>
+        <li class="menu-item" data-tab="website">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          Websites
+        </li>
+        <li class="menu-item" data-tab="ssh">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+          SSH Servers
+        </li>
+        <li class="menu-item" data-tab="settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Settings
+        </li>
+      </ul>
+      
+      <div class="sidebar-footer">
+        <button id="lock-vault-btn" class="lock-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          Lock Vault
+        </button>
+      </div>
+    </aside>
+    
+    <!-- Main Dashboard Area -->
+    <main>
+      <header>
+        <div class="search-bar-container">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="search-input" placeholder="Search logins, hosts...">
+        </div>
+        
+        <div class="header-actions">
+          <button id="add-entry-btn" class="btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Add Credential
+          </button>
+        </div>
+      </header>
+      
+      <!-- Dashboard Grid Split -->
+      <div class="dashboard-content">
+        <!-- Entries Column -->
+        <div id="entries-list" class="entries-list-container">
+          <!-- Populated by javascript -->
+        </div>
+        
+        <!-- Details Column -->
+        <div id="detail-pane" class="detail-pane">
+          <!-- Populated by javascript -->
+          <div class="empty-detail-state">
+            <div class="big-icon">📁</div>
+            <p>Select a credential card to view details or launch SSH sessions.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add / Edit Modal -->
+  <div id="entry-modal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="modal-title">Add Credential</h3>
+        <button id="modal-close-btn" class="modal-close">×</button>
+      </div>
+      
+      <form id="entry-form">
+        <input type="hidden" id="entry-id">
+        <div class="modal-body">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="entry-type">Credential Type</label>
+              <select id="entry-type">
+                <option value="website">Website</option>
+                <option value="ssh">SSH Server</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="entry-title">Title / Name</label>
+              <input type="text" id="entry-title" placeholder="e.g. AWS Production" required>
+            </div>
+          </div>
+          
+          <!-- WEBSITE Specific Fields -->
+          <div id="website-fields">
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label for="entry-url">Website URL</label>
+              <input type="text" id="entry-url" placeholder="https://example.com/login">
+            </div>
+          </div>
+          
+          <!-- SSH Specific Fields -->
+          <div id="ssh-fields" style="display: none;">
+            <div class="form-row" style="margin-bottom: 16px;">
+              <div class="form-group">
+                <label for="entry-host">Host / IP</label>
+                <input type="text" id="entry-host" placeholder="e.g. 10.0.0.1">
+              </div>
+              <div class="form-group">
+                <label for="entry-port">Port</label>
+                <input type="number" id="entry-port" value="22" placeholder="22">
+              </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label for="entry-keypath">Private Key Path (Optional)</label>
+              <input type="text" id="entry-keypath" placeholder="e.g. /home/user/.ssh/id_rsa">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label for="entry-extraoptions">SSH Options (Optional)</label>
+              <input type="text" id="entry-extraoptions" placeholder="e.g. -A -o StrictHostKeyChecking=no">
+            </div>
+            
+            <!-- SSH Jump Hosts Dynamic List -->
+            <div class="jumps-section" id="jumps-section" style="display: block;">
+              <div class="jumps-section-header">
+                <h5 style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);">Proxy Jumps (Bastions)</h5>
+                <button type="button" id="add-jump-row-btn" class="btn-secondary" style="padding: 4px 10px; font-size: 0.75rem; border-radius: var(--radius-sm);">+ Add Jump</button>
+              </div>
+              <div id="jumps-list-edit" class="jumps-list-edit">
+                <!-- Jump rows added by JS -->
+              </div>
+            </div>
+          </div>
+          
+          <!-- Common Fields -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="entry-username">Username / Email</label>
+              <input type="text" id="entry-username" placeholder="e.g. admin" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="entry-password">Password / Secret Phrase</label>
+              <div class="password-input-container">
+                <input type="password" id="entry-password" placeholder="••••••••••••" required>
+                <button type="button" id="toggle-form-password" class="btn-generate" title="Show/Hide">👁</button>
+                <button type="button" id="generate-password-btn" class="btn-generate" title="Generate Secure Password">⚡</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="entry-notes">Notes</label>
+            <textarea id="entry-notes" rows="3" placeholder="Additional details..."></textarea>
+          </div>
+          
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" id="modal-cancel-btn" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Save Credential</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div id="toast" class="toast">Copied to clipboard</div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

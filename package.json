@@ -1,0 +1,26 @@
+{
+  "name": "passlock",
+  "version": "1.0.0",
+  "description": "Premium, cross-platform password manager with SSH proxy jump launching and extension autofill",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron . --disable-gpu",
+    "start": "electron . --disable-gpu",
+    "test": "node test-crypto.js"
+  },
+  "keywords": [
+    "password-manager",
+    "ssh",
+    "proxyjump",
+    "autofill"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "electron": "^31.3.1"
+  }
+}
