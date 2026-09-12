@@ -81,8 +81,9 @@ class DbManager {
 
     const apiToken = crypto.randomBytes(16).toString('hex');
     const initialDb = {
-      version: 1,
+      version: 2,
       apiToken: apiToken,
+      categories: [],
       logins: []
     };
 
@@ -112,6 +113,21 @@ class DbManager {
       this.decryptedData = JSON.parse(decryptedText);
       this.masterPassword = masterPassword;
       this.isUnlocked = true;
+
+      // Auto-migration to version 2
+      if (!this.decryptedData.version || this.decryptedData.version === 1) {
+        this.decryptedData.version = 2;
+        this.decryptedData.categories = this.decryptedData.categories || [];
+        if (Array.isArray(this.decryptedData.logins)) {
+          this.decryptedData.logins.forEach(login => {
+            if (login.category === undefined) {
+              login.category = null;
+            }
+          });
+        }
+        this._save();
+      }
+
       return true;
     } catch (err) {
       console.error("Unlock failed:", err.message);
@@ -181,6 +197,61 @@ class DbManager {
     this.decryptedData.logins = this.decryptedData.logins.filter(l => l.id !== id);
     
     if (this.decryptedData.logins.length !== initialLength) {
+      this._save();
+      return true;
+    }
+    return false;
+  }
+
+  // Get all categories
+  getCategories() {
+    this.checkUnlocked();
+    return this.decryptedData.categories || [];
+  }
+
+  // Save/Update a category
+  saveCategory(catData) {
+    this.checkUnlocked();
+
+    if (!this.decryptedData.categories) {
+      this.decryptedData.categories = [];
+    }
+
+    if (!catData.id) {
+      catData.id = crypto.randomUUID();
+    }
+
+    const index = this.decryptedData.categories.findIndex(c => c.id === catData.id);
+    if (index !== -1) {
+      this.decryptedData.categories[index] = catData;
+    } else {
+      this.decryptedData.categories.push(catData);
+    }
+
+    this._save();
+    return catData;
+  }
+
+  // Delete a category
+  deleteCategory(id) {
+    this.checkUnlocked();
+
+    if (!this.decryptedData.categories) {
+      this.decryptedData.categories = [];
+    }
+
+    const initialLength = this.decryptedData.categories.length;
+    this.decryptedData.categories = this.decryptedData.categories.filter(c => c.id !== id);
+
+    if (this.decryptedData.logins && Array.isArray(this.decryptedData.logins)) {
+      this.decryptedData.logins.forEach(login => {
+        if (login.category === id) {
+          login.category = null;
+        }
+      });
+    }
+
+    if (this.decryptedData.categories.length !== initialLength) {
       this._save();
       return true;
     }
