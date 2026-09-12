@@ -60,20 +60,28 @@ class ApiServer {
         const logins = dbManager.getLogins();
         const searchDomain = domain.toLowerCase();
 
-        // Filter logins by domain matching in the URL
+        // Filter logins by domain matching in the URL or Title
         const matches = logins
           .filter(login => {
             if (login.type !== 'website') return false;
-            if (!login.url) return false;
             
+            const rawUrl = (login.url || '').toLowerCase().trim();
+            const rawTitle = (login.title || '').toLowerCase().trim();
+            const cleanSearch = searchDomain.replace(/^www\./, '');
+
+            if (!rawUrl && !rawTitle) return false;
+
+            // Normalize URL protocol
+            let hostStr = rawUrl;
+            if (rawUrl && !rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+              hostStr = 'https://' + rawUrl;
+            }
+
             try {
-              // Try parsing as full URL
-              const urlHost = new URL(login.url).hostname.toLowerCase();
-              return urlHost.includes(searchDomain) || searchDomain.includes(urlHost);
+              const urlHost = new URL(hostStr).hostname.toLowerCase().replace(/^www\./, '');
+              return urlHost.includes(cleanSearch) || cleanSearch.includes(urlHost) || rawTitle.includes(cleanSearch);
             } catch (e) {
-              // Fallback to simple string inclusion
-              const rawUrl = login.url.toLowerCase();
-              return rawUrl.includes(searchDomain) || searchDomain.includes(rawUrl);
+              return rawUrl.includes(cleanSearch) || cleanSearch.includes(rawUrl) || rawTitle.includes(cleanSearch);
             }
           })
           .map(login => ({
