@@ -1,4 +1,5 @@
-const { app, BrowserWindow, ipcMain, shell, clipboard } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, clipboard, dialog } = require('electron');
+const fs = require('fs');
 const path = require('path');
 const dbManager = require('./db-manager');
 const sshLauncher = require('./ssh-launcher');
@@ -10,10 +11,12 @@ let lastCopiedValue = '';
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1000,
+    width: 1060,
     height: 720,
     minWidth: 800,
     minHeight: 600,
+    resizable: true,
+    useContentSize: false,
     title: 'PassLock',
     frame: true, // Keep standard frame but style inside
     titleBarStyle: 'default',
@@ -23,7 +26,6 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: true
     },
-    // Set icon if available (can add a placeholder or skip)
     icon: path.join(__dirname, 'icon.png')
   });
 
@@ -123,6 +125,35 @@ ipcMain.handle('db:reset-api-token', async () => {
   }
 });
 
+// Get categories
+ipcMain.handle('db:get-categories', async () => {
+  try {
+    return { success: true, categories: dbManager.getCategories() };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+// Save category
+ipcMain.handle('db:save-category', async (event, catData) => {
+  try {
+    const saved = dbManager.saveCategory(catData);
+    return { success: true, category: saved };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+// Delete category
+ipcMain.handle('db:delete-category', async (event, id) => {
+  try {
+    const success = dbManager.deleteCategory(id);
+    return { success };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
 // SSH launch
 ipcMain.handle('ssh:launch', async (event, loginData) => {
   try {
@@ -168,6 +199,48 @@ ipcMain.handle('clipboard:copy', async (event, text) => {
     }, 30000); // 30 seconds
 
     return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+// File import: open file dialog
+ipcMain.handle('file:pick', async () => {
+  try {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Import Credentials File',
+      properties: ['openFile'],
+      filters: [
+        { name: 'All Supported', extensions: ['csv', 'json', 'txt', 'conf', 'config'] },
+        { name: 'CSV Files', extensions: ['csv'] },
+        { name: 'JSON Files', extensions: ['json'] },
+        { name: 'SSH Config', extensions: ['conf', 'config', 'txt'] },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    });
+
+    if (result.canceled || !result.filePaths.length) {
+      return { success: false, canceled: true };
+    }
+
+    const filePath = result.filePaths[0];
+    const content = fs.readFileSync(filePath, 'utf8');
+    const fileName = require('path').basename(filePath);
+    return { success: true, content, fileName };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+// Bulk save logins
+ipcMain.handle('db:bulk-save-logins', async (event, loginsArray) => {
+  try {
+    let saved = 0;
+    for (const loginData of loginsArray) {
+      dbManager.saveLogin(loginData);
+      saved++;
+    }
+    return { success: true, count: saved };
   } catch (err) {
     return { success: false, error: err.message };
   }
